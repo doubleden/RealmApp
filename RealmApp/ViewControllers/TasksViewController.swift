@@ -76,13 +76,25 @@ final class TasksViewController: UITableViewController {
             isDone(true)
         }
         
-        let doneAction = UIContextualAction(style: .normal, title: "Done") { [unowned self] _, _, isDone in
-            storageManager.done(task)
-            tableView.performBatchUpdates({
-                tableView.deleteRows(at: [indexPath], with: .left)
-                let newIndexPath = IndexPath(row: completedTasks.count - 1, section: 1)
-                tableView.insertRows(at: [newIndexPath], with: .left)
-            })
+        let doneAction = UIContextualAction(
+            style: .normal,
+            title: task.isComplete ? "Undone" : "Done"
+        ) { [unowned self] _, _, isDone in
+            if task.isComplete {
+                storageManager.undone(task)
+                tableView.performBatchUpdates({
+                    tableView.deleteRows(at: [indexPath], with: .left)
+                    let newIndexPath = IndexPath(row: currentTasks.count - 1, section: 0)
+                    tableView.insertRows(at: [newIndexPath], with: .left)
+                })
+            } else {
+                storageManager.done(task)
+                tableView.performBatchUpdates({
+                    tableView.deleteRows(at: [indexPath], with: .left)
+                    let newIndexPath = IndexPath(row: completedTasks.count - 1, section: 1)
+                    tableView.insertRows(at: [newIndexPath], with: .left)
+                })
+            }
             isDone(true)
         }
         

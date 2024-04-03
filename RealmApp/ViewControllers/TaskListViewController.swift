@@ -108,11 +108,9 @@ final class TaskListViewController: UITableViewController {
     }
 
     @IBAction func sortingList(_ sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == 1 {
-            taskLists = taskLists.sorted(byKeyPath: "title", ascending: true)
-        } else {
-            taskLists = originStateTaskLists
-        }
+        taskLists = sender.selectedSegmentIndex == 1 
+        ? taskLists.sorted(byKeyPath: "title", ascending: true)
+        : originStateTaskLists
         
         tableView.reloadData()
     }

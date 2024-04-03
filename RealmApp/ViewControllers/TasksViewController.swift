@@ -82,18 +82,10 @@ final class TasksViewController: UITableViewController {
         ) { [unowned self] _, _, isDone in
             if task.isComplete {
                 storageManager.undone(task)
-                tableView.performBatchUpdates({
-                    tableView.deleteRows(at: [indexPath], with: .left)
-                    let newIndexPath = IndexPath(row: currentTasks.count - 1, section: 0)
-                    tableView.insertRows(at: [newIndexPath], with: .left)
-                })
+                tableView.moveRow(at: indexPath, to: IndexPath(row: currentTasks.count - 1, section: 0))
             } else {
                 storageManager.done(task)
-                tableView.performBatchUpdates({
-                    tableView.deleteRows(at: [indexPath], with: .left)
-                    let newIndexPath = IndexPath(row: completedTasks.count - 1, section: 1)
-                    tableView.insertRows(at: [newIndexPath], with: .left)
-                })
+                tableView.moveRow(at: indexPath, to: IndexPath(row: completedTasks.count - 1, section: 1))
             }
             isDone(true)
         }
@@ -114,7 +106,7 @@ final class TasksViewController: UITableViewController {
 }
 
 // MARK: - Private Methods
-private extension TasksViewController {
+private extension TasksViewController {    
     func showAlert(with task: Task? = nil, completion: (() -> Void)? = nil) {
         let alertBuilder = AlertControllerBuilder(
             title: task != nil ? "Edit Task" : "New Task",

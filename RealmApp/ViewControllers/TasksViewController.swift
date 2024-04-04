@@ -80,11 +80,10 @@ final class TasksViewController: UITableViewController {
             style: .normal,
             title: task.isComplete ? "Undone" : "Done"
         ) { [unowned self] _, _, isDone in
+            storageManager.changeIsComplete(in: task)
             if task.isComplete {
-                storageManager.undone(task)
                 tableView.moveRow(at: indexPath, to: IndexPath(row: currentTasks.count - 1, section: 0))
             } else {
-                storageManager.done(task)
                 tableView.moveRow(at: indexPath, to: IndexPath(row: completedTasks.count - 1, section: 1))
             }
             isDone(true)

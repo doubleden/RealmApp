@@ -12,7 +12,6 @@ import RealmSwift
 final class TaskListViewController: UITableViewController {
 
     private var taskLists: Results<TaskList>!
-    private var originStateTaskLists: Results<TaskList>!
     private let storageManager = StorageManager.shared
     private let dataManager = DataManager.shared
     
@@ -26,7 +25,6 @@ final class TaskListViewController: UITableViewController {
         )
         
         taskLists = storageManager.fetchData(TaskList.self)
-        originStateTaskLists = taskLists
         createTempData()
     }
     
@@ -49,10 +47,10 @@ final class TaskListViewController: UITableViewController {
         content.text = taskList.title
         
         if taskList.tasks.isEmpty {
-            content.secondaryText = String(taskList.tasks.count)
+            content.secondaryText = taskList.tasks.count.formatted()
             cell.accessoryType = .none
         } else if !currentTasks.isEmpty {
-            content.secondaryText = String(currentTasks.count)
+            content.secondaryText = currentTasks.count.formatted()
             cell.accessoryType = .none
         } else {
             cell.accessoryType = .checkmark
@@ -83,12 +81,7 @@ final class TaskListViewController: UITableViewController {
             style: .normal,
             title: currentTasks.isEmpty ? "Undone" : "Done"
         ) { [unowned self] _, _, isDone in
-            if currentTasks.isEmpty {
-                storageManager.undone(taskList)
-            } else {
-                storageManager.done(taskList)
-            }
-            
+            storageManager.done(taskList)
             tableView.reloadRows(at: [indexPath], with: .automatic)
             isDone(true)
         }
@@ -110,7 +103,7 @@ final class TaskListViewController: UITableViewController {
     @IBAction func sortingList(_ sender: UISegmentedControl) {
         taskLists = sender.selectedSegmentIndex == 1 
         ? taskLists.sorted(byKeyPath: "title", ascending: true)
-        : originStateTaskLists
+        : taskLists.sorted(byKeyPath: "date", ascending: true)
         
         tableView.reloadData()
     }

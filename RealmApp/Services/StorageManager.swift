@@ -59,12 +59,6 @@ final class StorageManager {
             taskList.tasks.setValue(true, forKey: "isComplete")
         }
     }
-    
-    func undone(_ taskList: TaskList) {
-        write {
-            taskList.tasks.setValue(false, forKey: "isComplete")
-        }
-    }
 
     // MARK: - Tasks
     func save(_ task: String, withNote note: String, to taskList: TaskList, completion: (Task) -> Void) {
@@ -88,15 +82,9 @@ final class StorageManager {
         }
     }
     
-    func done(_ task: Task) {
+    func changeIsComplete(in task: Task) {
         write {
-            task.isComplete = true
-        }
-    }
-    
-    func undone(_ task: Task) {
-        write {
-            task.isComplete = false
+            task.isComplete.toggle()
         }
     }
     

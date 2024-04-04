@@ -15,6 +15,7 @@ final class TasksViewController: UITableViewController {
     
     private var currentTasks: Results<Task>!
     private var completedTasks: Results<Task>!
+    
     private let storageManager = StorageManager.shared
 
     override func viewDidLoad() {
@@ -27,7 +28,6 @@ final class TasksViewController: UITableViewController {
             action: #selector(addButtonPressed)
         )
         navigationItem.rightBarButtonItems = [addButton, editButtonItem]
-        
         currentTasks = taskList.tasks.filter("isComplete = false")
         completedTasks = taskList.tasks.filter("isComplete = true")
     }
@@ -79,13 +79,22 @@ final class TasksViewController: UITableViewController {
         let doneAction = UIContextualAction(
             style: .normal,
             title: task.isComplete ? "Undone" : "Done"
-        ) { [unowned self] _, _, isDone in
+        ) {
+            [unowned self] _,
+            _,
+            isDone in
             storageManager.changeIsComplete(in: task)
-            if task.isComplete {
-                tableView.moveRow(at: indexPath, to: IndexPath(row: currentTasks.count - 1, section: 0))
-            } else {
-                tableView.moveRow(at: indexPath, to: IndexPath(row: completedTasks.count - 1, section: 1))
-            }
+                
+            task.isComplete
+            ? tableView.moveRow(
+                at: indexPath,
+                to: IndexPath(row: completedTasks.index(of: task) ?? 0, section: 1)
+            )
+            : tableView.moveRow(
+                at: indexPath,
+                to: IndexPath(row: currentTasks.index(of: task) ?? 0, section: 0)
+            )
+            
             isDone(true)
         }
         
@@ -105,7 +114,8 @@ final class TasksViewController: UITableViewController {
 }
 
 // MARK: - Private Methods
-private extension TasksViewController {    
+private extension TasksViewController {
+    
     func showAlert(with task: Task? = nil, completion: (() -> Void)? = nil) {
         let alertBuilder = AlertControllerBuilder(
             title: task != nil ? "Edit Task" : "New Task",
